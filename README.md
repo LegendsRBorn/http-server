@@ -1,39 +1,62 @@
-# C HTTP Server 
+# 🌐 C HTTP Web Server: Building the Web from Scratch
 
-A HTTP web server written in C using POSIX sockets. This helps us demonstrate core systems programming concepts including network socket programming, manual memory management, pointer-based string parsing, binary/text file I/O, bitwise configuration flags, and signal handling.
-
----
-
-## Project Structure
-
-```text
-c-http-server/
-├── Makefile                # Compiles all .c files into the final executable
-├── server.conf             # Text file storing Port, Root Dir, and Flag settings
-├── access.log              # Output file where server writes visitor logs
-├── include/                # Header files (Structs, Macros, Function Prototypes)
-│   ├── server.h            # Socket setup prototypes, global config structs
-│   ├── http.h              # HTTP request/response structs, bitmask flags, unions
-│   ├── file_ops.h          # Binary/Text file loader & MIME type prototypes
-│   └── logger.h            # Logging macros and text file logging prototypes
-├── src/                    # Source code files
-│   ├── main.c              # Entry point: reads config, starts loop, handles signals
-│   ├── server.c            # Socket bind/listen/accept logic
-│   ├── http.c              # String/Pointer parsing of GET/POST requests
-│   ├── file_ops.c          # Reads HTML/images using fread/fseek/ftell & malloc
-│   └── logger.c            # Appends request logs to access.log using fprintf
-└── www/                    # Static frontend files hosted by the server
-    ├── index.html          # Main landing page
-    ├── style.css           # Stylesheet
-    └── logo.png            # Sample binary image asset
----
+Written in C, this project demonstrates an understanding of core systems programming, POSIX network sockets, memory management, and file I/O.
 
 ## Features
 
-* **POSIX Socket Networking:** Full TCP socket lifecycle (`socket`, `bind`, `listen`, `accept`) capable of handling incoming client connections.
-* **HTTP Request Parsing:** Custom string and pointer arithmetic parser for `GET` and `POST` requests, extracting methods, URIs, headers, and payloads using structured types, bitmask flags, and unions.
-* **Static & Binary File Serving:** Dynamically reads and serves both text (`HTML`, `CSS`) and binary (`PNG`, `JPG`, etc.) assets from the `www/` directory using `fseek`, `ftell`, `fread`, and dynamic heap allocation (`malloc`/`free`).
-* **MIME Type Resolution:** Automatically detects file extensions and attaches the appropriate `Content-Type` headers.
-* **External Configuration:** Reads server parameters (Port, Root Directory, operational flags) at runtime via `server.conf` without requiring recompilation.
-* **Access Logging:** Appends formatted visitor and request metadata directly to `access.log` using buffered file streams (`fprintf`).
-* **Graceful Shutdown:** Intercepts OS signals (such as `SIGINT`) in the main event loop to cleanly close active file descriptors and free allocated memory before exiting.
+* **Dynamic Configuration:** Reads server settings (port, root directory, flags) on startup from `server.conf`.
+* **Static File Hosting:** Successfully serves HTML, CSS, and JS to render modern web pages.
+* **Binary File Streaming:** Safely calculates and transmits raw binary files (like PNG/JPG images) over TCP sockets without data corruption.
+* **Real-time Access Logging:** Automatically records incoming requests, timestamps, and HTTP response codes to an `access.log` text file.
+* **Memory Safety:** Strictly manages heap allocations (`malloc`/`calloc`) for incoming request buffers and ensures graceful memory releases (`free`) to prevent leaks.
+
+## File Architecture
+what each module is responsible for:
+
+### Source Files (`src/`)
+* **`main.c` (The Orchestrator):** The entry point of the server. It reads the `server.conf` file using text I/O (`fgets`), initializes the server state, and manages the main infinite loop that keeps the server alive.
+* **`server.c` (The Networking Core):** Wraps the complex POSIX socket API. It handles creating the socket, binding it to a port, listening for traffic, and accepting incoming client connections.
+* **`http.c` (The Protocol Engine):** The brain of request handling. It uses advanced pointer arithmetic to parse raw HTTP request strings (extracting GET/POST methods and URIs) without relying on heavy string-copying, ensuring high performance.
+* **`file_ops.c` (The File System Bridge):** Manages all disk interactions. Matches requested file extensions to MIME types, uses binary file I/O (`fseek`, `ftell`, `fread`) to determine exact file sizes, and loads files into dynamically allocated memory blocks for transmission.
+* **`logger.c` (The Observability Module):** Handles writing server events and access logs to `access.log` using standard `fprintf`. 
+
+### Header Files (`include/`)
+* **`*.h` files:** Act as the architectural blueprints. They contain our `#define` macros (buffer sizes, status codes), custom `structs` (like `HttpRequest` and `ServerConfig`), `unions`, and all function prototypes to ensure strict type-checking across the codebase.
+
+## 📚 Syllabus Concepts Mastered
+
+* **Pointers vs Strings:** Efficient memory navigation without relying on basic arrays.
+* **Dynamic Memory Management:** Robust use of `malloc`, `calloc`, and `free`.
+* **Text & Binary File Operations:** Mastery of both character-stream and raw byte-stream file handling.
+* **Abstract Data Types:** Heavy utilization of `structs` to manage complex network states and `unions` for memory-efficient data representation.
+* **Bitwise Operations:** Used for setting and reading application configuration flags.
+
+## run 
+
+### 1. Compile the server
+Run the provided Makefile from the root directory to compile all source files into a single executable:
+```bash
+make
+```
+
+### 2. Configure the server
+Check `server.conf` to ensure your desired port is set (default is usually `8080`).
+
+### 3. Start the server
+Execute the compiled binary:
+```bash
+./http_server
+```
+
+### 4. Test it out
+Open your favorite web browser and navigate to:
+`http://localhost:8080/index.html`
+
+To view the server logs, open `access.log` in your terminal:
+```bash
+cat access.log
+```
+
+## 👥 The Engineers
+
+IDEAS:**[ARYAN SARDA]** & **[ANANYA SINGH]**
